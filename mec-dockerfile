@@ -1,0 +1,24 @@
+version: '3.2'
+
+services:
+  mec:
+    hostname: mec
+    container_name: mec101
+    build: .
+    command: >
+       sh -c "iptables -I FORWARD -j NFQUEUE --queue-num 0 ; /bin/bash"
+    networks:
+     public_net:
+       ipv4_address: 192.168.71.141
+    volumes:
+     - type: bind
+       source: "./file/"
+       target: "/root/file/"
+    tty: true
+    stdin_open: true
+    privileged: true
+
+networks:
+   public_net:
+     external: true
+     name: rfsim5g-oai-public-net
