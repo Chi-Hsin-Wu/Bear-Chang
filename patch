@@ -1,0 +1,37 @@
+diff --git a/5g_rfsimulator/docker-compose.yaml b/5g_rfsimulator/docker-compose.yaml
+index 38a65a7..7a79e3c 100644
+--- a/5g_rfsimulator/docker-compose.yaml
++++ b/5g_rfsimulator/docker-compose.yaml
+@@ -70,12 +70,23 @@ services:
+             - SMF_SELECTION=yes
+             - USE_FQDN_DNS=yes
+             - USE_HTTP2=no
++        cap_add:
++           - NET_ADMIN
++           - SYS_ADMIN
++        cap_drop:
++           - ALL
++        privileged: true
+         depends_on:
+             - oai-nrf
+             - mysql
+         networks:
+             public_net:
+                 ipv4_address: 192.168.71.132
++        healthcheck:
++            test: /bin/bash -c "arp -i eth0 -s 192.168.71.140 02:42:c0:a8:47:8d"
++            interval: 10s
++            timeout: 5s
++            retries: 5
+     oai-smf:
+         container_name: "rfsim5g-oai-smf"
+         image: oaisoftwarealliance/oai-smf:v1.5.0
+@@ -188,7 +199,7 @@ services:
+             public_net:
+                 ipv4_address: 192.168.71.140
+         healthcheck:
+-            test: /bin/bash -c "pgrep nr-softmodem"
++            test: /bin/bash -c "arp -i eth0 -s 192.168.71.132 02:42:c0:a8:47:8d; pgrep nr-softmodem"
+             interval: 10s
+             timeout: 5s
+             retries: 5
